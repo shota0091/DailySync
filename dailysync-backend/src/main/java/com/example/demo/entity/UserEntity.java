@@ -11,7 +11,7 @@ import lombok.Data;
 
 @Entity
 @Data
-@Table(name = "user")  // テーブル名。PostgreSQLでは予約語注意だけどMySQLならOK
+@Table(name = "user") 
 public class UserEntity {
 
     @Id

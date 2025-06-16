@@ -1,7 +1,12 @@
 package com.example.demo.controller;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import jakarta.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -12,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.example.demo.entity.UserDTO;
 import com.example.demo.entity.UserEntity;
 import com.example.demo.service.UserService;
 
@@ -32,8 +38,21 @@ public class UserController {
     }
 
     @PostMapping
-    public void createUser(@RequestBody UserEntity user) {
+    public ResponseEntity<?> createUser(@Valid @RequestBody UserDTO userdto,BindingResult result) {
+    	if(result.hasErrors()) {
+    		List<String> errors = result.getFieldErrors().stream()
+    	            .map(err -> err.getField() + ": " + err.getDefaultMessage())
+    	            .collect(Collectors.toList());
+    	        return ResponseEntity.badRequest().body(errors);
+    		
+    	}
+    	UserEntity user = new UserEntity();
+    	user.setName(userdto.getName());
+    	user.setPassword(userdto.getPassword());
+    	
         userService.saveUser(user);
+        return ResponseEntity.ok("ユーザー作成成功");
+    	
     }
 
     @DeleteMapping("/{id}")
